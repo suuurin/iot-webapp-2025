@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 레이아웃</title>
+    <style>
+        /* 전체 중앙정렬 */
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0 auto; /* 제일 중요! */
+            width: 500px;
+        }
+
+        /* 메뉴의 수평정렬 */
+        div.container {
+            overflow: hidden;
+        }
+        div.item {
+            float: left;
+            margin: 0 5px;
+            padding: 10px;
+            border: 2px solid brown;
+        }
+        p.colored {
+            width: 400px;
+            color: teal;
+            /* ... 으로 글자 생략 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        /* 절대 위치 */
+        #container {
+            width:400px;
+            height:300px;
+            border: 2px solid black;
+            overflow: hidden;
+            position: relative; /*상대적위치*/
+        }
+        .circle {
+            position: absolute; /*절대경로. container 안에서의 절대경로 */
+            width: 50px; height: 50px;
+            border-radius: 50px;
+        }
+        #red {
+            background-color: red;
+            left: 20px; top: 20px;
+            box-shadow: 3px 3px 4px gray;
+        }
+        #green {
+            background-color: green;
+            right: 20px; top: 20px;
+            box-shadow: 3px 3px 4px gray;
+        }
+        #blue {
+            background-color: blue;
+            right: 20px; bottom: 20px;
+            box-shadow: 3px 3px 4px gray;
+        }
+        #yellow {
+            background-color: gold;
+            left: 20px; bottom: 20px;
+            box-shadow: 3px 3px 4px gray;
+        }
+    </style>
+</head>
+<body>
+    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</p>
+    <div class="container">
+        <div class="item">menu1</div>
+        <div class="item">menu2</div>
+        <div class="item">menu3</div>
+        <div class="item">menu4</div>
+        <div class="item">menu5</div>
+    </div>
+    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</p>
+    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+        It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+        and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    </p>
+
+    <div id="container">
+        <div id="red" class="circle"></div>
+        <div id="green" class="circle"></div>
+        <div id="blue" class="circle"></div>
+        <div id="yellow" class="circle"></div>
+    </div>
+    <p class="colored">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+</body>
+</html>
