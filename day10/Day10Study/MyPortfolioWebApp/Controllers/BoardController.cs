@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPortfolioWebApp.Models;
 
@@ -21,41 +16,27 @@ namespace MyPortfolioWebApp.Controllers
         // GET: Board
         public async Task<IActionResult> Index(int page = 1, string search = "")
         {
-            // 뷰쪽에 보내고 싶은 데이터
-            //ViewData["Key"] //ViewBag.Title //TempData["Key"]
             ViewData["Title"] = "서버에서 변경가능";
-            // _context News
-            // SELECT * FROM News.
-            //return View(await _context.News
-            //                       .OrderByDescending(o => o.PostDate)
-            //                       .ToListAsync()); // 뷰화면에 데이터를 가지고감
-            // 쿼리로 처리가능
-            //var news = await _context.News.FromSql($@"SELECT Id, Writer, Title, Description, PostDate, ReadCount
-            //                                            FROM News")
-            //                        .OrderByDescending(o => o.PostDate)
-            //                        .ToListAsync();
-            //return View(news);
-
-            // 최종단계
-            // 페이지 개수
-            //var totalCount = _context.News.FromSql($@"SELECT * FROM News WHERE Title LIKE '%{search}%'").Count(); // 현재 문제발생!!
-            var totalCount = _context.Board.Where(n => EF.Functions.Like(n.Title, $"%{search}%")).Count(); // HACK! 위 구문이 오류발생
+            var totalCount = _context.Board.Where(n => EF.Functions.Like(n.Title, $"%{search}%")).Count(); // 전체 게시글 수 
             var countList = 10; // 한페이지에 기본 뉴스갯수 10개
-            var totalPage = totalCount / countList; // 한페이지당 개수로 나누면 전체페이지 수
-            // HACK : 게시판페이지 중요로직. 남는 데이터도 한페이지를 차지해야 함
-            if (totalCount % countList > 0) totalPage++;  // 남은 게시글이 있으면 페이지수 증가            
+            var totalPage = totalCount / countList; // 한 페이지당 개수로 나누면 전체 페이지 수 
+
+            // HACK : 게시판 페이지 중요로직, 남는 데이터도 한 페이지를 차지해야 함 
+            if (totalCount % countList > 0) totalPage++;  // 남은 게시글이 있으면 페이지수 증가
             if (totalPage < page) page = totalPage;
+
             // 마지막 페이지 구하기
             var countPage = 10; // 페이지를 표시할 최대페이지개수, 10개
             var startPage = ((page - 1) / countPage) * countPage + 1;
             var endPage = startPage + countPage - 1;
-            // HACK : 나타낼 페이수가 10이 안되면 페이지수 조정.
+            // 나타낼 페이수가 10이 안되면 페이지 수 조정.
             // 마지막페이지까지 글이 12개면  1, 2 페이지만 표시
             if (totalPage < endPage) endPage = totalPage;
 
-            // 저장프로시저에 보낼 rowNum값, 시작번호랑 끝번호
+            // 저장 프로시저에 보낼 rowNum값, 시작 번호랑 끝 번호
             var startCount = ((page - 1) * countPage) + 1; // 2페이지의 경우 11
             var endCount = startCount + countList - 1; // 2페이지의 경우 20
+
 
             // View로 넘기는 데이터, 페이징 숫자컨트롤 사용
             ViewBag.StartPage = startPage;
@@ -65,10 +46,11 @@ namespace MyPortfolioWebApp.Controllers
             ViewBag.Search = search; // 검색어
 
             // 저장프로시저 호출
-            var board = await _context.Board
-            .FromSqlInterpolated($"CALL Free_PagingBoard({startCount}, {endCount}, {search})")
-            .ToListAsync();
+            var board = await _context.Board.FromSql($"CALL Free_PagingBoard({startCount}, {endCount}, {search})").ToListAsync();
             return View(board);
+
+
+            // return View(await _context.Board.ToListAsync());
         }
 
         // GET: Board/Details/5
@@ -79,6 +61,7 @@ namespace MyPortfolioWebApp.Controllers
                 return NotFound();
             }
 
+            // SELECT * FROM News WHERE id = @id
             var board = await _context.Board
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (board == null)
@@ -94,42 +77,40 @@ namespace MyPortfolioWebApp.Controllers
             return View(board);
         }
 
+
         // GET: Board/Create
         public IActionResult Create()
         {
             var board = new Board
             {
-                Writer = User.Identity?.Name ?? "익명",
-                Email = "unknown@example.com", // Email 추후 개선 가능
+                Writer = "user",
                 PostDate = DateTime.Now,
-                ReadCount = 0
+                ReadCount = 0,
             };
-            return View(board);
+            return View(board);  // View로 데이터를 가져갈게 아무것도 없음
         }
-
-
 
         // POST: Board/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents")] Board board)
+        public async Task<IActionResult> Create([Bind("Id,Email,Writer,Title,Contents")] Board board)
         {
             if (ModelState.IsValid)
             {
-                board.Writer = User.Identity?.Name ?? "익명";
-                board.Email = "unknown@example.com";
-                board.PostDate = DateTime.Now;
-                board.ReadCount = 0;
 
+                board.PostDate = DateTime.Now; // 현재 날짜로 설정
+                board.ReadCount = 0; // 조회수 초기화
+
+                // INSERT INTO...
                 _context.Add(board);
+                // COMMIT
                 await _context.SaveChangesAsync();
 
-                TempData["success"] = "게시글 작성 완료!";
+                TempData["success"] = "게시판 정보 입력 성공!";
                 return RedirectToAction(nameof(Index));
             }
-
             return View(board);
         }
 
@@ -141,6 +122,7 @@ namespace MyPortfolioWebApp.Controllers
                 return NotFound();
             }
 
+            // SELECT * FROM News WHERE id = @id
             var board = await _context.Board.FindAsync(id);
             if (board == null)
             {
@@ -154,7 +136,7 @@ namespace MyPortfolioWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Contents")] Board board)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,Writer,Title,Contents,PostDate,ReadCount")] Board board)
         {
             if (id != board.Id)
             {
@@ -165,17 +147,21 @@ namespace MyPortfolioWebApp.Controllers
             {
                 try
                 {
-                    // 원래 글을 DB에서 불러옴
+                    // 방식2 원본을 찾아서 수정해주는 방식
                     var existingBoard = await _context.Board.FindAsync(id);
                     if (existingBoard == null)
+                    {
                         return NotFound();
-
-                    // 제목과 내용만 수정
+                    }
                     existingBoard.Title = board.Title;
                     existingBoard.Contents = board.Contents;
 
-                    // 나머지 필드 (작성자, 이메일, 날짜, 조회수 등)는 유지
+                    // UPDATE News SET ...
+                    //_context.Update(news); // 방식1 ID가 같은 새글을 UPDATE하면 수정                    
+                    // COMMIT
                     await _context.SaveChangesAsync();
+                    TempData["success"] = "게시판 정보 수정 성공!";
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -219,12 +205,13 @@ namespace MyPortfolioWebApp.Controllers
             var board = await _context.Board.FindAsync(id);
             if (board != null)
             {
+                // DELETE FROM News WHERE id = @id
                 _context.Board.Remove(board);
             }
-
+            // COMMIT
             await _context.SaveChangesAsync();
 
-            TempData["success"] = "뉴스 삭제 성공!";
+            TempData["success"] = "게시판 정보 삭제 성공!";
             return RedirectToAction(nameof(Index));
         }
 

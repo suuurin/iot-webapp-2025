@@ -1,39 +1,41 @@
 ﻿@model IEnumerable<MyPortfolioWebApp.Models.Board>
 @inject SignInManager<CustomUser> SignInManager
-@inject UserManager<CustomUser> UserManger
+@inject UserManager<CustomUser> UserManager
 
 @{
-    // 컨트롤러 변수값이 바로 사용할 수 없음
+    //ViewData["Title"] = "Index";
+}
+@{
+    //컨트롤러 변수값이 바로 사용할 수 없음
     // ViewBag, ViewData, TempData로 전달
     var startPage = ViewBag.StartPage;
     var endPage = ViewBag.EndPage;
     var page = ViewBag.Page;
     var totalPage = ViewBag.TotalPage;
-    // 검색어도 컨트롤러에서 넘겨옴
+    //검색어도 컨트롤러에서 넘어옴
     var search = ViewBag.Search;
 }
 
-<partial name="_Notification" />
 
-<section id="board" class="section">
+<section id="Board" class="section">
     <div class="container section-title" data-aos="fade-up">
         <h2>자유게시판</h2>
-        <p>자유게시판입니다</p>
+        <p>자유롭게 의견을 남기는 공간입니다.</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="row justify-content-between mb-2">
+        <div class="row mb-2 justify-content-between">
             <div class="col-3">
                 @if (SignInManager.IsSignedIn(User))
                 {
                     <a asp-controller="Board" asp-action="Create"
-                       class="btn btn-sm btn-success btn-kelly">작성</a>
+                       class="btn btn-sm btn-success btn-kelly"> 작성</a>
                 }
             </div>
-            <div class="col-6">
+            <div class="col-6 end-50">
                 <form asp-action="Index" method="get">
                     <div class="input-group input-group-sm justify-content-end">
-                        <input type="text" id="search" name="search" class="form-control-sm" value="@search" />
+                        <input type="text" id="search" name="search" class="form-control-sm" value="@ViewBag.Search" />
                         <button type="submit" class="btn btn-success">검색</button>
                     </div>
                 </form>
@@ -44,6 +46,9 @@
                 <tr>
                     <th>
                         @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Writer)
@@ -57,6 +62,7 @@
                     <th>
                         @Html.DisplayNameFor(model => model.ReadCount)
                     </th>
+
                 </tr>
             </thead>
             <tbody>
@@ -67,9 +73,13 @@
                             @Html.DisplayFor(modelItem => item.Id)
                         </td>
                         <td class="content-center">
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td class="content-center">
                             @Html.DisplayFor(modelItem => item.Writer)
                         </td>
                         <td>
+                            <!-- Title에만 링크 -->
                             <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Title)</a>
                         </td>
                         <td class="content-center">
@@ -78,6 +88,7 @@
                         <td class="content-center">
                             @Html.DisplayFor(modelItem => item.ReadCount)
                         </td>
+
                     </tr>
                 }
             </tbody>
@@ -86,16 +97,14 @@
         <div class="text-center mt-3">
             <div class="in">
                 <ul class="pagination pagination-sm justify-content-center">
-                    @if (page > 1) // 첫페이지 버튼
+                    @if (page > 1)//첫페이지 버튼
                     {
                         <li class="page-item"><a href="?page=1&search=@search" class="page-link">≪</a></li>
                     }
-
-                    @if (page > 1) // 이전페이지 버튼
+                    @if (page > 1) //이전 페이지 버튼
                     {
-                        <li class="page-item"><a href="?page=@(page-1)&search=@search" class="page-link">＜</a></li>
+                        <li class="page-item"><a href="?page=@(page - 1)&search=@search" class="page-link">＜</a></li>
                     }
-
                     @for (var pcount = startPage; pcount <= endPage; pcount++)
                     {
                         if (pcount == page)
@@ -107,12 +116,10 @@
                             <li class="page-item"><a href="?page=@pcount&search=@search" class="page-link">@pcount</a></li>
                         }
                     }
-
-                    @if (page < totalPage) // 다음페이지
+                    @if (page < totalPage)
                     {
                         <li class="page-item"><a href="?page=@(page + 1)&search=@search" class="page-link">＞</a></li>
                     }
-
                     @if (page != totalPage) // 마지막 페이지
                     {
                         <li class="page-item"><a href="?page=@totalPage&search=@search" class="page-link">≫</a></li>
@@ -120,8 +127,5 @@
                 </ul>
             </div>
         </div>
-
     </div>
-
 </section>
-

@@ -1,0 +1,56 @@
+-- MySQL dump 10.13  Distrib 8.0.41, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: smarthome
+-- ------------------------------------------------------
+-- Server version	9.2.0
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `fakedatas`
+--
+
+DROP TABLE IF EXISTS `fakedatas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `fakedatas` (
+  `sensing_dt` datetime NOT NULL,
+  `pub_id` varchar(10) NOT NULL,
+  `count` decimal(10,0) NOT NULL,
+  `temp` decimal(5,1) NOT NULL,
+  `humid` decimal(5,1) NOT NULL,
+  `light` char(1) NOT NULL,
+  `human` char(1) NOT NULL,
+  PRIMARY KEY (`sensing_dt`,`pub_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fakedatas`
+--
+
+LOCK TABLES `fakedatas` WRITE;
+/*!40000 ALTER TABLE `fakedatas` DISABLE KEYS */;
+INSERT INTO `fakedatas` VALUES ('2025-05-20 17:20:15','IOT69',7458,22.2,50.5,'1','0'),('2025-05-20 17:20:16','IOT69',7459,28.1,56.7,'0','1'),('2025-05-20 17:20:17','IOT69',7460,27.2,48.5,'0','1'),('2025-05-20 17:20:18','IOT69',7461,22.8,61.0,'0','1'),('2025-05-20 17:20:19','IOT69',7462,29.8,60.3,'0','0'),('2025-05-20 17:20:20','IOT69',7463,23.5,60.5,'1','0'),('2025-05-20 17:20:21','IOT69',7464,25.2,44.5,'0','0'),('2025-05-20 17:20:22','IOT69',7465,28.2,55.5,'1','1'),('2025-05-20 17:20:23','IOT69',7466,21.4,61.6,'0','0'),('2025-05-20 17:20:24','IOT69',7467,27.8,43.1,'1','0'),('2025-05-20 17:20:25','IOT69',7468,22.0,48.4,'0','1'),('2025-05-20 17:20:26','IOT69',7469,28.4,61.0,'0','0'),('2025-05-20 17:20:27','IOT69',7470,25.3,61.7,'0','1'),('2025-05-20 17:20:28','IOT69',7471,26.2,41.1,'1','1'),('2025-05-20 17:20:29','IOT69',7472,24.6,44.4,'0','0'),('2025-05-20 17:20:30','IOT69',7473,27.9,45.1,'0','1');
+/*!40000 ALTER TABLE `fakedatas` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-06-12 16:07:38
