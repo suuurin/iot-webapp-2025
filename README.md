@@ -973,7 +973,7 @@
 |GET ~/api/books/{id}|특정 책정보 가져오기|None|책정보 한 건|
 |POST ~/api/books|새 책 추가|Book 데이터|Book 데이터|
 |PUT ~/api/books/{id}|기존책 수정|Book|None|
-|DELET ~/api/books/{id}|기존책 삭제|None|None|
+|DELETE ~/api/books/{id}|기존책 삭제|None|None|
 
 <img src="./image/web0026.png" width="600">
 
@@ -1019,6 +1019,180 @@
 
 ### ASP.NET Core API서버(계속)
 
-#### WebAPI 서버 + 웹사이트 + 윈앱
+#### WebAPI 서버 + 윈앱(WPF)
+- 웹사이트나 WPF 윈앱에서는 DB연동 없이도 데이터 처리가 가능!!
+- Todo List 오늘할일 API 서비스
+
+    |API|설명|Request body|Response body|
+    |:--|:--|:--|:--|
+    |GET /api/todoitems|모든 할일정보 가져오기|None|할일정보 배열|
+    |GET /api/todoitems/{id}|특정 할일정보 가져오기|None|할일정보 한 건|
+    |POST /api/todoitems|새 할일 추가|todoItem 데이터|todoItem 데이터|
+    |PUT /api/todoitems/{id}|기존할일 수정|todoItem 데이터|None|
+    |DELETE /api/todoitems/{id}|기존할일 삭제|None|None|
+
+    1. 프로젝트 생성
+    2. 패키지 설치
+    3. DB구성, 생성
+    4. 컨트롤러 생성(내용 생략, 위에 다있음)
+
+- WPF앱 API 사용 - 데이터포털로 부산맛집정보앱, 영화즐겨찾기와 동일(GET메서드만 사용)
+    1. WPF 프로젝트 생성
+    2. NuGet 패키지 관리에서 패키지 설치
+        - MahApps.Metro / IconPacks
+        - Microsoft.AspNet.WebApi.Client 
+    3. UI 설정
+    4. 모델설정, 컬렉션 설정
+    5. WebAPI 호출로 CRUD 구현
+
+    <img src="./image/web0032.png" width="600">
+
+## 13일차
+
+### ASP.NET Core API서버(계속)
+
+#### WebAPI 서버 + 웹사이트
+- WebAPI 서버는 전일자 프로젝트 사용
+- ASP.NET Core 프로젝트에서 정적페이지HTML, 동적페이지cshtml 동시 사용가능
+- 웹사이트만 새로 생성
+    1. ASP.NET Core 비어있음 으로 프로젝트 생성
+    2. wwwroot/html/index.html 파일 생성 - VS Code의 Live Server 예제와 동일(정적페이지)
+    3. Program.cs에서 MVC패턴 관련된 로직 추가
+    4. Controllers/HomeController.cs 생성
+    5. Index() 메서드에서 뷰 추가 - ASP.NET Core 동적페이지
+    6. Views 폴더 하위 파일들이 필요
+        - _ViewImports.cshtml
+        - _ViewStart.cshtml
+        - Shared/_Layout.cshtml.css 
+    7. index.html에 화면UI 구현
+    8. AJAX로 WebAPI 호출하고 데이터를 화면에 뿌리는 로직 추가
+    9. input 태그로 검색부분 구현
+        - Javascript와 데이터를 주고받으면 form태그가 없어도 됨
+        - `<form>` - 서버사이드와 데이터를 주고 받을때 필요
+    10. 입력부분 구현
+    11. jQuery 로직 구현
+
+- AJAX : Asyncronous Javascript And Xml. 자바스크립트에서 비동기로 메서드를 호출 기술
+    - 예전에 XML로만 데이터 전달. 현재는 Json으로 이전 중
+
+- CORS Policy : Cross-Origin Resource Sharing. 다른 출처 리소스 접근허용 보안 메커니즘
+    - 아무나 URL로 호출을 못하도록 웹페이지 보안설정
+    - WebAPI 서비스에서 Program.cs에 CORS 호출권한 설정 추가
+    - 프론트엔드는 CORS 설정 필요없음
+
+    <img src="./image/web0033.png" width="400">
+
+## 14일차
+
+### ASP.NET Core API서버(계속)
+
+#### WebAPI 서버 + 웹사이트(계속)
+- 할일 수정/삭제
+- 실행화면
+
+    <img src="./image/web0034.png" width="600">
+
+- 결론
+    - WebAPI로 백엔드를 운영하면 프론트는 모두 사용가능(윈앱, 웹앱, 모바일앱)
 
 ### AWS 클라우드 업로드
+- 클라우드서비스 사용 : 어디서나 웹사이트 공개
+- 온프레미스 : 직접 서버를 구축. DB서버구축, 웹서버구축 등 직접 운영
+    - 서버 하드웨어 구매, 서버실 구축, UPS구성, 네트워크 스위치구성
+    - OS구매, SW구매, 운영환경구성, 개발환경구성
+    - 운영하면 문제 해결, 유지보수
+- 클라우드 : 서버구축 필요없음. DB서버 신청 생성
+    - 서버실 구축x, 하드웨어 구매x, SW구매x, 운영문제 관리x
+    - 최초 구축비용이 들지 않음
+    - 사용료가 저렴하지 않음
+
+- AWS 라이트세일 - https://aws.amazon.com/ko/lightsail/
+    - 기존 AWS보다 저렴하게 사용할 수 있는 서비스
+
+#### AWS 라이트세일에 웹서버 올리기
+1. 인스턴스 생성
+    1. Microsoft Windows > Windows Server 2019 > 
+    2. 네트워크 듀얼스택 
+    3. 크기, 월별 $9.5 선택 `90일 무료`
+    4. 인스턴스 이름 
+    5. 인스턴스 생성
+2. 인스턴스 관리 > RDP를 사용하여 연결
+    1. 초기화 대기(네트워크 나올때까지, 1분가량)
+    2. Network2 허용 Yes 클릭
+    3. Server Manager 오픈
+        - Configure this local server
+        - IE Enhanced Security Config : ON(웹사이트 오픈 불가) -> OFF
+3. 필요 SW 다운로드
+    1. MySQL Installer for Windows
+    2. Chrome browser(option)
+    3. FileZilla FTP Server 
+4. MySQL 설치
+    1. Custom 선택
+    2. MySQL Server 8.0.42 - x64 만 선택, 설치 후 Next
+    3. 일반적으로 Next
+    4. Authentication Method > Use Legacy Authentication (Retain MySQL 5.x Compatibility) 선택
+        - 암호정책이 간결
+        - 대신 AWS는 IP나 공개된 상황이라 간단한 암호하면 절대 안됨
+    5. 나머지는 Next, Execute 실행
+    6. 마지막에 Finish 클릭
+    7. Firewall & Network Protection 실행 > Advanced setting 선택
+        - Inbound Rules > Port 3306 확인, 없으면 생성
+    8. 라이트세일 인스턴스 관리 > 네트워크
+        - IPv4 방화벽에 규칙추가
+    9. MySQL Workbench 접속 생성/확인
+
+5. FileZilla FTP 서버 설치
+    1. 설치는 Next로 설치
+    2. 서버 시작 후
+    3. 메뉴 Server > Configure
+        - Server listener의 아이피 0.0.0.0 -> 본인의 내부서버 아이피로 변경
+    4. 프로토콜 셋팅 > FTP and FTP over TLS 메뉴
+        - Connection Security
+            - Generate new 버튼 클릭 후 OK
+        - Passive Mode
+            - Use custom port range 클릭
+            - From : 55000
+            - To : 55999   
+    5. 탐색기 오픈, Website 폴더 생성     
+    6. Right Management > Users 사용자 계정 생성
+        - 사용자 생성
+        - Mount points
+            - Virtual Path : / (root)
+            - Native path : 탐색기에서 만든 Website 지정
+    7. Firewall & Network Protection > Advanced setting
+        - Inbound Rules
+        - New Rule
+            - Program FileZilla Server 선택
+            - 전부 오픈
+    8. 라이트세일 인스턴스 관리
+        - 네트워크 IPv4 방화벽에서 21, 55000~55999 포트 오픈
+
+    9. 로컬PC에 파일질라 클라이언트 설치
+        - 접속확인
+
+6. Visual Studio 프로젝트 오픈(MyPortfolioWebApp)
+    1. 게시 > FTP/FTPS 선택
+    2. 서버 - ftps://aws-public-ip
+    3. 사이트경로 - /
+    4. 수동모드 - 체크
+    5. 사용자이름/패스워드 - FileZilla 서버 설정한 계정
+    6. 연결유효성후 인증서 승인
+
+7. MySQL Workbench
+    1. Local DB의 데이터베이스 Server > Data Export로 백업
+    2. AWS MySQL Workbench에서 FTP로 전달한 sql을 Server > Data Import로 복구
+    3. 저장프로시저는 쿼리 복사해서 재실행
+
+
+
+
+
+### 부가적인 기능
+- OAuth (구글로그인)
+- 파일업로드
+
+### MyPortfolio 완성
+
+## 15일차
+
+### 전체 마무리
