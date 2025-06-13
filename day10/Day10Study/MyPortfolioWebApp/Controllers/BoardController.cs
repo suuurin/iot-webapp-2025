@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Markdig.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPortfolioWebApp.Models;
+using System.Diagnostics;
 
 namespace MyPortfolioWebApp.Controllers
 {
@@ -95,10 +97,42 @@ namespace MyPortfolioWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Email,Writer,Title,Contents")] Board board)
+        public async Task<IActionResult> Create([Bind("Id,Email,Writer,Title,Contents")] Board board, IFormFile? UploadFile)
         {
+            const long MaxFileSize = 10 * 1024 * 1024;
+
             if (ModelState.IsValid)
             {
+                // 파일이 존재하면
+                if (UploadFile != null && UploadFile.Length > 0)
+                {
+                    // 서버에 파일 저장, 모델에 파일경로 저장
+                    Debug.WriteLine(UploadFile.Length);
+
+                    if (UploadFile.Length > MaxFileSize)
+                    {
+                        ModelState.AddModelError("UploadFile", "파일크기는 10MB 이하로 제한합니다.");
+                        return View();
+                    }
+
+                    string upFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "upload");
+                    Directory.CreateDirectory(upFolder); // 폴더가 없으면 생성
+
+                    // example.jpg 파일이 여러번 올라가면 파일이 겹쳐짐
+                    // 파일명을 변경
+                    // Guid.NewGuid() = 랜덤아이디 생성
+                    // Path.GetExtension() = 파일의 확장자만 가져옴 .jpg
+                    string newFileName = Guid.NewGuid() + Path.GetExtension(UploadFile.FileName); // 21213-21312-123-1-2111.jpg
+                    string filePath = Path.Combine(upFolder, newFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await UploadFile.CopyToAsync(stream); // 파일 저장
+                    }
+
+                    // 모델에 파일명 할당
+                    board.UploadFile = newFileName;
+                }
 
                 board.PostDate = DateTime.Now; // 현재 날짜로 설정
                 board.ReadCount = 0; // 조회수 초기화
@@ -136,8 +170,10 @@ namespace MyPortfolioWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,Writer,Title,Contents,PostDate,ReadCount")] Board board)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,Writer,Title,Contents,PostDate,ReadCount")] Board board, IFormFile? UploadFile)
         {
+            const long MaxFileSize = 10 * 1024 * 1024;
+
             if (id != board.Id)
             {
                 return NotFound();
@@ -153,8 +189,51 @@ namespace MyPortfolioWebApp.Controllers
                     {
                         return NotFound();
                     }
+
                     existingBoard.Title = board.Title;
                     existingBoard.Contents = board.Contents;
+
+                    // 파일이 존재하면
+                    if (UploadFile != null && UploadFile.Length > 0)
+                    {
+                        if (UploadFile.Length > MaxFileSize)
+                        {
+                            ModelState.AddModelError("UploadFile", "파일크기는 10MB 이하로 제한합니다.");
+
+                            // 기존 파일명 복원해서 View에 전달
+                            board.UploadFile = existingBoard.UploadFile;
+                            return View(board);
+                        }
+
+                        string upFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "upload");
+                        Directory.CreateDirectory(upFolder); // 폴더가 없으면 생성
+
+                        // 기존 파일은 폴더에서 삭제 (이 부분 추가!)
+                        if (!string.IsNullOrEmpty(existingBoard.UploadFile))
+                        {
+                            string oldFilePath = Path.Combine(upFolder, existingBoard.UploadFile);
+                            // System.IO.File : 파일 관련 작업 클래스 (파일 처리 기능)
+                            if (System.IO.File.Exists(oldFilePath)) // 해당 경로에 파일이 실제로 존재하는가?
+                            {
+                                System.IO.File.Delete(oldFilePath); // 실제로 삭제
+                            }
+                        }
+
+                        // example.jpg 파일이 여러번 올라가면 파일이 겹쳐짐
+                        // 파일명을 변경
+                        // Guid.NewGuid() = 랜덤아이디 생성
+                        // Path.GetExtension() = 파일의 확장자만 가져옴 .jpg
+                        string newFileName = Guid.NewGuid() + Path.GetExtension(UploadFile.FileName); // 21213-21312-123-1-2111.jpg
+                        string filePath = Path.Combine(upFolder, newFileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await UploadFile.CopyToAsync(stream); // 파일 저장
+                        }
+
+                        // 이전뉴스 파일명 할당
+                        existingBoard.UploadFile = newFileName;
+                    }
 
                     // UPDATE News SET ...
                     //_context.Update(news); // 방식1 ID가 같은 새글을 UPDATE하면 수정                    
